@@ -29,6 +29,7 @@ jobs:
       runningSystem: ${{ matrix.runningSystem }}
       testCompilation: ${{ matrix.testCompilation }}
       webBuild: ${{ matrix.webBuild }}
+      regularBuilds: ${{ matrix.regularBuilds }}
   manual:
     needs:
       - build
