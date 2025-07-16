@@ -15,6 +15,10 @@ on:
         description: "Build web version"
         required: true
         type: boolean
+      regularBuilds:
+        description: "Build regular version"
+        required: true
+        type: boolean
   workflow_dispatch:
     inputs:
       runningSystem:
@@ -27,6 +31,10 @@ on:
         type: boolean
       webBuild:
         description: "Build web version"
+        required: true
+        type: boolean
+      regularBuilds:
+        description: "Build regular version"
         required: true
         type: boolean
 
@@ -63,7 +71,7 @@ jobs:
         run: just library
 
   build-matrix:
-    if: inputs.webBuild == false
+    if: inputs.regularBuilds == true
     runs-on: ${{ inputs.runningSystem }}
     strategy:
       matrix:
@@ -105,7 +113,7 @@ jobs:
           path: bin/*
 
   compile-tests:
-    if: inputs.testCompilation == true && inputs.webBuild == false
+    if: inputs.testCompilation == true
     runs-on: ${{ inputs.runningSystem }}
     steps:
       - uses: actions/checkout@v4
@@ -166,11 +174,11 @@ jobs:
           just web_copy_artifacts
       - uses: actions/upload-artifact@v4
         with:
-          name: emscripten
+          name: ${{ inputs.runningSystem }}-web
           path: bin
 
   finalize:
-    if: inputs.webBuild == false
+    if: inputs.regularBuilds == true
     needs: build-matrix
     runs-on: ${{ inputs.runningSystem }}
     steps:
@@ -182,6 +190,8 @@ jobs:
           pattern: "*-${{ inputs.runningSystem }}-${{ github.run_id }}"
       - name: Restore build directories
         run: |
+          ls -R
+          mkdir -p bin
           mv profiler-${{ inputs.runningSystem }}-${{ github.run_id }}/* bin/ || true
           mv update-${{ inputs.runningSystem }}-${{ github.run_id }}/* bin/ || true
           mv capture-${{ inputs.runningSystem }}-${{ github.run_id }}/* bin/ || true
