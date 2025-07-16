@@ -129,7 +129,6 @@ jobs:
 
   web-build:
     if: inputs.webBuild == true
-    needs: setup
     runs-on: ${{ inputs.runningSystem }}
     steps:
       - uses: actions/checkout@v4
@@ -172,7 +171,7 @@ jobs:
 
   finalize:
     if: inputs.webBuild == false
-    needs: [library, build-matrix]
+    needs: build-matrix
     runs-on: ${{ inputs.runningSystem }}
     steps:
       - name: Download workspace
